@@ -242,7 +242,7 @@ class AddGameScreenState extends State<NewGamePage> {
           new Container(width: 70, child:Text(game_state.players[widget.game_data.players[i]].name)),
           new Container(width: 70, child:Radio(value : widget.game_data.players[i], groupValue: widget.game_data.winner, onChanged: (int newValue) {setState(() {widget.game_data.winner = newValue;widget.game_data.seen[i] = true;});})),
           new Container(width: 70, child:Checkbox(value: widget.game_data.seen[i],  onChanged: (bool newValue) {setState(() {if(widget.game_data.winner != widget.game_data.players[i]) widget.game_data.seen[i] = newValue;});} )),
-          new Container(width: 70, child:TextField(controller: score_input_controller[i], keyboardType:TextInputType.number )),
+          new Container(width: 70, child:TextField(controller: score_input_controller[i])),
 
           //new Container(width: 70, child:TextField(onChanged: (String newValue) {setState(() {widget.game_data.points[i] = int.parse(newValue);});}, keyboardType:TextInputType.numberWithOptions()))
         ],
