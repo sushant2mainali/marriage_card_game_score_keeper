@@ -21,7 +21,7 @@ class PlayerManagementTab extends StatelessWidget {
     if(name.length > 0)
       {
         if (game_state.add_player(name) == -1)
-          showAlertDialog(context, "Max 20 players");
+          showAlertDialog(context, "20 jaana bhanda halna mildaina. Dherai naam halera garna khojya k? Khelne bela 5 jaana ta ho max.");
       }
   }
 
@@ -47,14 +47,15 @@ class PlayerManagementTab extends StatelessWidget {
           }) :
           IconButton(icon: Icon(Icons.check_box_outline_blank), onPressed: () {
             if (!game_state.set_playing(index)) showAlertDialog(
-                context, "Only 5 players at a time!");
+                context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
           }),
           title: GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),),
 
           //TextFormField(decoration:InputDecoration(border: InputBorder.none) , initialValue: item.name, onFieldSubmitted: (String newName){ game_state.update_player_name(position,newName);}),
           trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
+            String player_name = game_state.get_player_name(index);
             if (!game_state.delete_player(index)) showAlertDialog(
-                context, "Cannot delete Player while game is in session!");
+                context, "Delete garna milena: $player_name ko hisab kitab baaki cha. Paisa na tiri bhagna mildaina!");
           }),
         );
       },
@@ -93,7 +94,7 @@ class PlayerManagementTab extends StatelessWidget {
       barrierDismissible: false, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Enter Player Name'),
+          title: Text('Kheladi ko naam'),
           content: new Row(
             children: <Widget>[
               new Expanded(
@@ -101,7 +102,7 @@ class PlayerManagementTab extends StatelessWidget {
                     autofocus: true,
                     initialValue:initial_name,
                     decoration: new InputDecoration(
-                        labelText: 'Player Name', hintText: 'eg. Hatti'),
+                        labelText: 'Naam', hintText: 'eg. Hatti, Gaida, Sungur etc.'),
                     onChanged: (value) {
                       player_name = value;
                     },

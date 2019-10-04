@@ -137,6 +137,18 @@ class Players
     if(players[index].active)
       this.players[index].name = name;
   }
+
+  int get number_of_playing_players
+  {
+    int num = 0;
+    for(int i=0;i<MAX_PLAYERS;i++)
+      {
+        if(this.players[i].is_playing)
+          num++;
+      }
+    return num;
+  }
+
 }
 
 
@@ -155,7 +167,7 @@ class Game
     this.seen = List(l);
     this.points = List(l);
     this.dubli = false;
-    this.calculated_score = List(l);
+    this.calculated_score = List<int>(l);
 
     for(int i=0;i<l;i++)
     {
@@ -177,27 +189,117 @@ class Game
     this.calculate_score();
   }
 
-  List<int> calculate_score()
+  void calculate_score()
   {
-    for(int i = 0;i<this.players.length;i++)
+    int T = 0; // total
+    int n = this.players.length; // number of players
+
+    for(int i = 0;i<n;i++)
+    {
+      if( this.seen[i])
       {
-        this.calculated_score[i] = 10;
+        T += this.points[i];
       }
+      else
+      {
+        this.points[i] = 0; // if not seen, then score is 0 by default
+      }
+    }
+
+
+    // calculate score for each person and update chart
+    for(int i = 0;i<this.players.length;i++)
+    {
+      int player_id = this.players[i];
+      if( player_id != this.winner) // everyone except winner
+      {
+        int W = this.seen[i]?3:10; //if seen, then 10 else 3
+        W += this.dubli?5:0;
+        int S = this.points[i];
+        int points = T+W-(n*S);
+        this.calculated_score[i] = points;
+      }
+      else
+      {
+        this.calculated_score[i] = 0;
+      }
+    }
+
   }
 }
+
+enum ScoreCardAction{ADD,REMOVE}
 
 class ScoreCard
 {
   List<Game> games;
+  List<List<int>> score_grid = new List(MAX_PLAYERS);
+
+  ScoreCard()
+  {
+    games = [];
+    for(int i=0;i<MAX_PLAYERS;i++)
+      {
+        score_grid[i] = new List(MAX_PLAYERS);
+        for(int j=0;j<MAX_PLAYERS;j++)
+          score_grid[i][j] = 0;
+      }
+  }
 
   void add_game(Game g)
   {
+    g.calculate_score();
     this.games.add(g);
+    this.update_score_card(g,ScoreCardAction.ADD);
   }
 
   int number_of_games()
   {
     return this.games.length;
+  }
+
+  Game game_at_index(int index)
+  {
+    return this.games[index];
+  }
+
+  void delete_single_game(int index)
+  {
+    update_score_card(this.game_at_index(index), ScoreCardAction.REMOVE);
+    this.games.removeAt(index);
+  }
+
+  void update_score_card(Game g, ScoreCardAction action)
+  {
+    for(int i=0;i<g.players.length;i++)
+      {
+        if(g.calculated_score[i] > 0 )
+          {
+            if(action == ScoreCardAction.ADD)
+              this.score_grid[g.winner][g.players[i]] += g.calculated_score[i];
+            else
+              this.score_grid[g.winner][g.players[i]] -= g.calculated_score[i];
+          }
+        else if(g.calculated_score[i] < 0)
+          {
+            if(action == ScoreCardAction.ADD)
+              this.score_grid[g.players[i]][g.winner] += g.calculated_score[i].abs();
+            else
+              this.score_grid[g.players[i]][g.winner] -= g.calculated_score[i].abs();
+          }
+      }
+  }
+
+  bool is_payment_remaining(int player_id)
+  {
+    print(this.score_grid);
+    print(player_id);
+    for(int i=0;i<MAX_PLAYERS;i++)
+      {
+        if(this.score_grid[i][player_id] > 0 || this.score_grid[player_id][i] > 0)
+          return true;
+      }
+    return false;
   }
 
 }
@@ -258,7 +360,13 @@ class GameState with ChangeNotifier
 
   bool delete_player(int index)
   {
-    bool to_ret =  this.all_players.delete_player(index);
+    bool to_ret = false;
+    if(!this.score_card.is_payment_remaining(index))
+      {
+        this.all_players.delete_player(index);
+        to_ret = true;
+      }
+
     if(to_ret)
       notifyListeners();
     return to_ret;
@@ -267,6 +375,49 @@ class GameState with ChangeNotifier
   void update_player_name(int index, String name)
   {
     this.all_players.update_player_name(index, name);
+    notifyListeners();
+  }
+
+  int get number_of_playing_players
+  {
+    return this.all_players.number_of_playing_players;
+  }
+
+  List<int> get playing_players_list{
+    List<int> l = List();
+    for(int i = 0;i<this.number_of_players;i++)
+    {
+      if(this.all_players.is_playing(i))
+        l.add(i);
+    }
+    return l;
+  }
+
+  void add_new_game(Game g)
+  {
+    this.score_card.add_game(g);
+    notifyListeners();
+  }
+
+  int number_of_games()
+  {
+    return this.score_card.number_of_games();
+  }
+
+  Game game_at_index(int index)
+  {
+    return score_card.game_at_index(index);
+  }
+
+  Game delete_single_game(int index)
+  {
+    this.score_card.delete_single_game(index);
+    notifyListeners();
+  }
+
+  void delete_all_games()
+  {
+    this.score_card = new ScoreCard();
     notifyListeners();
   }
 }
