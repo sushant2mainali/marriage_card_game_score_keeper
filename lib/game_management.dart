@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marriage_game_scorekeeper/state_management.dart';
 import 'package:provider/provider.dart';
-
-
+import 'dart:math';
 
 class GameManagementTab extends StatefulWidget {
   @override
@@ -64,6 +63,8 @@ class GameManagementTabState extends State<GameManagementTab> {
       return ListView.builder(
         itemCount: game_state.number_of_games(),
         itemBuilder: (context, position) {
+          int file_num = 0 + Random().nextInt(51 - 0);
+          String file_name = "assets/card_images/"+file_num.toString()+".png";
           final item = game_state.game_at_index(position);
           String winner = game_state.get_player_name(item.winner);
           String game_number = (position + 1).toString();
@@ -86,7 +87,7 @@ class GameManagementTabState extends State<GameManagementTab> {
           }
 
           return ListTile(
-            leading: Text("Game - $game_number"),
+            leading: CircleAvatar(backgroundImage: AssetImage(file_name)),
             title: Text("Winner: $winner"),
             subtitle: Text("$hisab_kitab"),
             trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {

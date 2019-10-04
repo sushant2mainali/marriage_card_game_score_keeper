@@ -65,6 +65,7 @@ flutter:
     - assets/home_back.png
     - assets/game_back.png
     - assets/players_back.png
+    - assets/card_images/
 
 
   #  - images/a_dot_ham.jpeg
