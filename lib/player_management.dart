@@ -36,31 +36,56 @@ class PlayerManagementTab extends StatelessWidget {
 
   Widget createPlayerList(BuildContext context) {
     final game_state = Provider.of<GameState>(context);
-    return ListView.builder(
-      itemCount: game_state.number_of_players,
-      itemBuilder: (context, position) {
-        final index = game_state.index_of_player_at(position);
-        String image_name = "assets/image$index.png";
-        return ListTile(
-          leading: game_state.is_playing(index) ?
-          IconButton(icon: Icon(Icons.check_box), onPressed: () {
-            game_state.set_not_playing(index);
-          }) :
-          IconButton(icon: Icon(Icons.check_box_outline_blank), onPressed: () {
-            if (!game_state.set_playing(index)) showAlertDialog(
-                context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
-          }),
-          title: Row(children:[CircleAvatar(backgroundImage: AssetImage(image_name)),Text("  "), GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),)]), //
 
-          //TextFormField(decoration:InputDecoration(border: InputBorder.none) , initialValue: item.name, onFieldSubmitted: (String newName){ game_state.update_player_name(position,newName);}),
-          trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
-            String player_name = game_state.get_player_name(index);
-            if (!game_state.delete_player(index)) showAlertDialog(
-                context, "Delete garna milena: $player_name ko hisab kitab baaki cha. Paisa na tiri bhagna mildaina!");
-          }),
+    if(game_state.number_of_players > 0)
+      {
+        return ListView.builder(
+          itemCount: game_state.number_of_players,
+          itemBuilder: (context, position) {
+            final index = game_state.index_of_player_at(position);
+            String image_name = "assets/image$index.png";
+            return ListTile(
+              leading: game_state.is_playing(index) ?
+              IconButton(icon: Icon(Icons.check_box), onPressed: () {
+                game_state.set_not_playing(index);
+              }) :
+              IconButton(icon: Icon(Icons.check_box_outline_blank), onPressed: () {
+                if (!game_state.set_playing(index)) showAlertDialog(
+                    context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
+              }),
+              title: Row(children:[CircleAvatar(backgroundImage: AssetImage(image_name)),Text("  "), GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),)]), //
+
+              //TextFormField(decoration:InputDecoration(border: InputBorder.none) , initialValue: item.name, onFieldSubmitted: (String newName){ game_state.update_player_name(position,newName);}),
+              trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
+                String player_name = game_state.get_player_name(index);
+                if (!game_state.delete_player(index)) showAlertDialog(
+                    context, "Delete garna milena: $player_name ko hisab kitab baaki cha. Paisa na tiri bhagna mildaina!");
+              }),
+            );
+          },
         );
-      },
-    );
+      }
+    else{
+      var _w = GestureDetector(
+          onTap: () {add_player(context, game_state);},
+          child: Text("Click here to add a new Player.\n", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20)));
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset(
+              'assets/players_back.png', height: 200.0,
+            ),
+            Text("\n"),
+            Text("No players added!\n", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+            _w
+          ],
+        ),
+      );
+    }
+
   }
 
   showAlertDialog(BuildContext context, String text) {

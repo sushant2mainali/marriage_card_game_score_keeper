@@ -9,7 +9,10 @@ void main() {
   runApp(TabbedApp());
 }
 
+TabController controller;
+
 class TabbedApp extends StatelessWidget{
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -29,6 +32,7 @@ class TabbedApp extends StatelessWidget{
                 title: Text('Marriage Score Keeper'),
               ),
               body: TabBarView(
+                controller: controller,
                 children: <Widget>[
                   HomeTab(),
                   GameManagementTab(),

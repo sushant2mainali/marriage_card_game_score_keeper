@@ -29,62 +29,99 @@ class GameManagementTabState extends State<GameManagementTab> {
               FlatButton.icon(
                   label:Text("Add Game"),
                   icon: Icon(Icons.add),
-                  onPressed: () {
-                    int num_of_players = game_state.number_of_playing_players;
-                    if( num_of_players >= 2)
-                    {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>NewGamePage(game_data: new Game.empty(num_of_players),),
-                        ),
-                      );
-                    }
-                    else
-                    {
-                      showAlertDialog(context,"Message","Dui jaana chaincha game khelna. Players ma gaera dui jaana ko naam agadi check lagaunus. Bhaneko bujhnu bhaena bhane ali raksi kaam garne bela bhaecha!");
-                    }
-
-                  }),
+                  onPressed: () { addNewGame(context, game_state); } ),
             ],
           ),
         )
     );
   }
 
+  void addNewGame(BuildContext context, GameState game_state)
+  {
+    int num_of_players = game_state.number_of_playing_players;
+    if( num_of_players >= 2)
+    {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>NewGamePage(game_data: new Game.empty(num_of_players),),
+        ),
+      );
+    }
+    else
+    {
+      showAlertDialog(context,"Message","Dui jaana chaincha game khelna. Players ma gaera dui jaana ko naam agadi check lagaunus. Bhaneko bujhnu bhaena bhane ali raksi kaam garne bela bhaecha!");
+    }
+
+  }
 
   Widget createGameList(BuildContext context)
   {
     final game_state = Provider.of<GameState>(context);
-    return ListView.builder(
-      itemCount: game_state.number_of_games(),
-      itemBuilder: (context, position) {
-        final item = game_state.game_at_index(position);
-        String winner = game_state.get_player_name(item.winner);
-        String game_number = (position+1).toString();
-        String hisab_kitab = "Hisab Kitab:\n";
-        for(int i = 0; i< item.players.length; i++)
-        {
-          if(item.calculated_score[i] >0 )
-          {
-            hisab_kitab += game_state.get_player_name(item.players[i]) + " Pays " +
-                game_state.get_player_name(item.winner) + " "+item.calculated_score[i].toString() + "\n";
-          }
-          else if (item.calculated_score[i] < 0) // this means winner pays the other person
-          {
-            hisab_kitab += game_state.get_player_name(item.winner) + " Pays " +
-                game_state.get_player_name(item.players[i]) + " "+item.calculated_score[i].abs().toString() + "\n";
-          }
-        }
 
-        return ListTile(
-          leading: Text("Game - $game_number"),
-          title: Text("Winner: $winner"),
-          subtitle:Text("$hisab_kitab"),
-          trailing: IconButton(icon:Icon(Icons.delete),  onPressed:(){game_state.delete_single_game(position);}),
+    if(game_state.number_of_games() > 0)
+    {
+      return ListView.builder(
+        itemCount: game_state.number_of_games(),
+        itemBuilder: (context, position) {
+          final item = game_state.game_at_index(position);
+          String winner = game_state.get_player_name(item.winner);
+          String game_number = (position + 1).toString();
+          String hisab_kitab = "Hisab Kitab:\n";
+          for (int i = 0; i < item.players.length; i++) {
+            if (item.calculated_score[i] > 0) {
+              hisab_kitab +=
+                  game_state.get_player_name(item.players[i]) + " Pays " +
+                      game_state.get_player_name(item.winner) + " " +
+                      item.calculated_score[i].toString() + "\n";
+            }
+            else if (item.calculated_score[i] <
+                0) // this means winner pays the other person
+                {
+              hisab_kitab +=
+                  game_state.get_player_name(item.winner) + " Pays " +
+                      game_state.get_player_name(item.players[i]) + " " +
+                      item.calculated_score[i].abs().toString() + "\n";
+            }
+          }
+
+          return ListTile(
+            leading: Text("Game - $game_number"),
+            title: Text("Winner: $winner"),
+            subtitle: Text("$hisab_kitab"),
+            trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
+              game_state.delete_single_game(position);
+            }),
+          );
+        },
+      );
+    }
+    else
+      {
+        var _w;
+        if(game_state.number_of_playing_players >= 2)
+          _w =           GestureDetector(
+              onTap: () {addNewGame(context, game_state);},
+              child: Text("Click here to add a new Game.\n", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20)));
+        else
+          _w = Text("Go to \"Players\" tab to add and select atleast 2 players!\n", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),);
+
+        return Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.asset(
+                'assets/game_back.png', height: 200.0,
+              ),
+              Text("\n"),
+              Text("You have not added any games yet!\n", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+              _w,
+            ],
+          ),
         );
-      },
-    );
+      }
   }
 
   showAlertDialog(BuildContext context, String title, String text) {
