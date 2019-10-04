@@ -29,6 +29,17 @@ dev_dependencies:
     sdk: flutter
   provider: ^3.0.0
 
+  flutter_launcher_icons: "^0.7.3"
+
+#run flutter packages pub run flutter_launcher_icons:main to put icons in the correct location
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/launcher/ic_launcher.png"
+  image_path_android: "assets/launcher/ic_launcher.png"
+  adaptive_icon_background: "#5090FF"
+  adaptive_icon_foreground: "assets/launcher/ic_launcher.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
