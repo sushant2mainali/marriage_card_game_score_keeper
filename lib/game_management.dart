@@ -165,7 +165,8 @@ class AddGameScreenState extends State<NewGamePage> {
         appBar: AppBar(
           title: Text("Add new Game"),
         ),
-        body: Container(child: ListView(children: createNewGameForm(context) ,),
+        body: Container(child: ListView(children: createNewGameForm(context),
+            padding: const EdgeInsets.all(20.0)),
         ),
         bottomNavigationBar: BottomAppBar(
           child: new Row(
@@ -206,13 +207,15 @@ class AddGameScreenState extends State<NewGamePage> {
     int row_index = 1; // row index 0 is reserved for the heading
     for(int i = 0; i<widget.game_data.players.length;i++)
     {
+      String image_name = "assets/image"+widget.game_data.players[i].toString()+".png";
       rows[row_index] = Row(
         children: <Widget>[
+          new Container(width: 30, child:CircleAvatar(backgroundImage: AssetImage(image_name))),
+          new Container(width: 10, child:Text(" ")),
           new Container(width: 70, child:Text(game_state.get_player_name(widget.game_data.players[i]))),
-          new Container(width: 70, child:Radio(value : widget.game_data.players[i], groupValue: widget.game_data.winner, onChanged: (int newValue) {setState(() {widget.game_data.winner = newValue;widget.game_data.seen[i] = true;});})),
-          new Container(width: 70, child:Checkbox(value: widget.game_data.seen[i],  onChanged: (bool newValue) {setState(() {if(widget.game_data.winner != widget.game_data.players[i]) widget.game_data.seen[i] = newValue;});} )),
-          new Container(width: 70, child:TextField(controller: score_input_controller[i])),
-
+          new Container(width: 60, child:Radio(value : widget.game_data.players[i], groupValue: widget.game_data.winner, onChanged: (int newValue) {setState(() {widget.game_data.winner = newValue;widget.game_data.seen[i] = true;});})),
+          new Container(width: 60, child:Checkbox(value: widget.game_data.seen[i],  onChanged: (bool newValue) {setState(() {if(widget.game_data.winner != widget.game_data.players[i]) widget.game_data.seen[i] = newValue;});} )),
+          new Container(width: 60, child:TextField(controller: score_input_controller[i])),
           //new Container(width: 70, child:TextField(onChanged: (String newValue) {setState(() {widget.game_data.points[i] = int.parse(newValue);});}, keyboardType:TextInputType.numberWithOptions()))
         ],
       );
@@ -220,10 +223,11 @@ class AddGameScreenState extends State<NewGamePage> {
     }
 
     rows[0] = Row( children: <Widget>[
+      new Container(width: 40, child:Text("")),
       new Container(width: 70, child:Text("Name",style: TextStyle(fontWeight: FontWeight.bold,))),
-      new Container(width: 70, child:Text("Winner",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
-      new Container(width: 70, child:Text("Seen",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
-      new Container(width: 70, child:Text("Score",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
+      new Container(width: 60, child:Text("Winner",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
+      new Container(width: 60, child:Text("Seen",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
+      new Container(width: 60, child:Text("Score",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
     ]);
     return rows;
   }
