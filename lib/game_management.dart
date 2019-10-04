@@ -25,17 +25,7 @@ class GameManagementTabState extends State<GameManagementTab> {
               FlatButton.icon(
                   label:Text("Clear All"),
                   icon: Icon(Icons.fiber_new),
-                  onPressed: () {
-                    if(game_state.number_of_games() > 0)
-                      {
-                        game_state.delete_all_games();
-                        showAlertDialog(context,"Message","Sabai game haru suhaaaa!");
-                      }
-                    else
-                      {
-                        showAlertDialog(context,"Message","Eutai game kheleko chaina, k delete garnu?Achamma cha ba!");
-                      }
-                  }),
+                  onPressed: ()  => deleteAll(context,game_state)),
               FlatButton.icon(
                   label:Text("Add Game"),
                   icon: Icon(Icons.add),
@@ -120,6 +110,49 @@ class GameManagementTabState extends State<GameManagementTab> {
     );
   }
 
+  void deleteAll(BuildContext context, GameState game_state) async
+  {
+    if(game_state.number_of_games() > 0)
+    {
+      String deleteAllConfirm = await showDeleteAllDialog(context);
+      if(deleteAllConfirm == "Ok")
+      {
+        game_state.delete_all_games();
+        showAlertDialog(context,"Message","Sabai game haru suhaaaa!");
+      }
+    }
+    else
+    {
+      showAlertDialog(context,"Message","Eutai game kheleko chaina, k delete garnu?Achamma cha ba!");
+    }
+  }
+
+  Future<String> showDeleteAllDialog(BuildContext context) async {
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text("Sabai Delete Garne nai ho ta?"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete All'),
+              onPressed: () {
+                Navigator.of(context).pop("Ok");
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop("");
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 
