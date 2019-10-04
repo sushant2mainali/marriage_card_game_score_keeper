@@ -72,7 +72,7 @@ class GameManagementTabState extends State<GameManagementTab> {
         final item = game_state.game_at_index(position);
         String winner = game_state.get_player_name(item.winner);
         String game_number = (position+1).toString();
-        String hisab_kitab = "Winner: $winner\nHisab Kitab:\n";
+        String hisab_kitab = "Hisab Kitab:\n";
         for(int i = 0; i< item.players.length; i++)
         {
           if(item.calculated_score[i] >0 )
@@ -89,7 +89,8 @@ class GameManagementTabState extends State<GameManagementTab> {
 
         return ListTile(
           leading: Text("Game - $game_number"),
-          title:Text("$hisab_kitab"),
+          title: Text("Winner: $winner"),
+          subtitle:Text("$hisab_kitab"),
           trailing: IconButton(icon:Icon(Icons.delete),  onPressed:(){game_state.delete_single_game(position);}),
         );
       },

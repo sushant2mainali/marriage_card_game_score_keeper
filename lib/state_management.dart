@@ -292,8 +292,6 @@ class ScoreCard
 
   bool is_payment_remaining(int player_id)
   {
-    print(this.score_grid);
-    print(player_id);
     for(int i=0;i<MAX_PLAYERS;i++)
       {
         if(this.score_grid[i][player_id] > 0 || this.score_grid[player_id][i] > 0)
@@ -302,6 +300,20 @@ class ScoreCard
     return false;
   }
 
+  bool does_player_have_to_pay(int player_id)
+  {
+    for(int i=0;i<MAX_PLAYERS;i++)
+    {
+      if(this.score_grid[i][player_id] > 0)
+        return true;
+    }
+    return false;
+  }
+
+  int get_amount_to_pay(int player_from, int player_to)
+  {
+    return this.score_grid[player_to][player_from];
+  }
 }
 
 
@@ -419,6 +431,21 @@ class GameState with ChangeNotifier
   {
     this.score_card = new ScoreCard();
     notifyListeners();
+  }
+
+  int get max_players
+  {
+    return MAX_PLAYERS;
+  }
+
+  bool any_payments(int player_index)
+  {
+    return this.score_card.does_player_have_to_pay(player_index);
+  }
+
+  int get_amount_to_pay(int player_from, int player_to)
+  {
+    return this.score_card.get_amount_to_pay(player_from,player_to);
   }
 }
 
