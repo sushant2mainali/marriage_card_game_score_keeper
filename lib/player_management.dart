@@ -40,7 +40,7 @@ class PlayerManagementTab extends StatelessWidget {
       itemCount: game_state.number_of_players,
       itemBuilder: (context, position) {
         final index = game_state.index_of_player_at(position);
-
+        String image_name = "assets/image$index.png";
         return ListTile(
           leading: game_state.is_playing(index) ?
           IconButton(icon: Icon(Icons.check_box), onPressed: () {
@@ -50,7 +50,7 @@ class PlayerManagementTab extends StatelessWidget {
             if (!game_state.set_playing(index)) showAlertDialog(
                 context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
           }),
-          title: GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),),
+          title: Row(children:[CircleAvatar(backgroundImage: AssetImage(image_name)),Text("  "), GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),)]), //
 
           //TextFormField(decoration:InputDecoration(border: InputBorder.none) , initialValue: item.name, onFieldSubmitted: (String newName){ game_state.update_player_name(position,newName);}),
           trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
