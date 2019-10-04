@@ -34,7 +34,7 @@ class HomeTab extends StatelessWidget {
                     hisab_kitab += "$to_player_name : $amount\n";
                   }
               }
-            return ListTile.(
+            return ListTile(
               leading: CircleAvatar(backgroundImage: AssetImage(image_name)),
               title: Text("$player_name Pays"),
               subtitle:Text("$hisab_kitab"),
