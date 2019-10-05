@@ -373,11 +373,13 @@ class GameState with ChangeNotifier
 {
   Players all_players;
   ScoreCard score_card;
+  double amount_per_point;
 
   GameState()
   {
     all_players = new Players();
     score_card = new ScoreCard();
+    amount_per_point = 1;
   }
 
   int add_player(String name)
@@ -509,6 +511,12 @@ class GameState with ChangeNotifier
     Game g = Game.summary();
     this.add_new_game(g);
 
+    notifyListeners();
+  }
+
+  void set_amount_per_point(double amount)
+  {
+    this.amount_per_point = amount;
     notifyListeners();
   }
 }
