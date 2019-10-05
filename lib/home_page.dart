@@ -9,10 +9,22 @@ class HomeTab extends StatelessWidget {
     final game_state = Provider.of<GameState>(context);
     return Scaffold(
       body: createPaymentList(context),
-      /*floatingActionButton: FloatingActionButton(
-          tooltip: 'IHelp',
-          child: const Icon(Icons.help),
-        )*/
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            FlatButton.icon(
+                label:Text("Minimize lenden"),
+                icon: Icon(Icons.attach_money),
+                onPressed: () { if(game_state.number_of_games() > 0) game_state.minimize_transactions();} ), // deleteAll(context,game_state)),
+            FlatButton.icon(
+                label:Text("Settings"),
+                icon: Icon(Icons.add),
+                onPressed: () => {}),
+          ],
+        ),
+      ),
     );
   }
 

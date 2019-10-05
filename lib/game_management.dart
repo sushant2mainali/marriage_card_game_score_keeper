@@ -65,35 +65,46 @@ class GameManagementTabState extends State<GameManagementTab> {
         itemBuilder: (context, position) {
           int file_num = 0 + Random().nextInt(51 - 0);
           String file_name = "assets/card_images/"+file_num.toString()+".png";
-          final item = game_state.game_at_index(position);
-          String winner = game_state.get_player_name(item.winner);
-          String game_number = (position + 1).toString();
-          String hisab_kitab = "Hisab Kitab:\n";
-          for (int i = 0; i < item.players.length; i++) {
-            if (item.calculated_score[i] > 0) {
-              hisab_kitab +=
-                  game_state.get_player_name(item.players[i]) + " Pays " +
-                      game_state.get_player_name(item.winner) + " " +
-                      item.calculated_score[i].toString() + "\n";
-            }
-            else if (item.calculated_score[i] <
-                0) // this means winner pays the other person
-                {
-              hisab_kitab +=
-                  game_state.get_player_name(item.winner) + " Pays " +
-                      game_state.get_player_name(item.players[i]) + " " +
-                      item.calculated_score[i].abs().toString() + "\n";
-            }
-          }
 
-          return ListTile(
-            leading: CircleAvatar(backgroundImage: AssetImage(file_name)),
-            title: Text("Winner: $winner"),
-            subtitle: Text("$hisab_kitab"),
-            trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
-              game_state.delete_single_game(position);
-            }),
-          );
+          final item = game_state.game_at_index(position);
+          if(!item.summary_game)
+            {
+              String winner = game_state.get_player_name(item.winner);
+              String hisab_kitab = "Hisab Kitab:\n";
+              for (int i = 0; i < item.players.length; i++) {
+                if (item.calculated_score[i] > 0) {
+                  hisab_kitab +=
+                      game_state.get_player_name(item.players[i]) + " Pays " +
+                          game_state.get_player_name(item.winner) + " " +
+                          item.calculated_score[i].toString() + "\n";
+                }
+                else if (item.calculated_score[i] <
+                    0) // this means winner pays the other person
+                    {
+                  hisab_kitab +=
+                      game_state.get_player_name(item.winner) + " Pays " +
+                          game_state.get_player_name(item.players[i]) + " " +
+                          item.calculated_score[i].abs().toString() + "\n";
+                }
+              }
+
+              return ListTile(
+                leading: CircleAvatar(backgroundImage: AssetImage(file_name)),
+                title: Text("Winner: $winner"),
+                subtitle: Text("$hisab_kitab"),
+                trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
+                  game_state.delete_single_game(position);
+                }),
+              );
+            }
+          else
+            {
+              return ListTile(
+                  leading: CircleAvatar(backgroundImage: AssetImage(file_name)),
+                  title: Text("Games before this has been Summarized."),
+                  subtitle: Text("Cannot delete summary.\nCheck Home Page for Payments.\nTap Clear All to reset all scores."),
+              );
+            }
         },
       );
     }

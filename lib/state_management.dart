@@ -160,6 +160,7 @@ class Game
   List<int> points;
   bool dubli;
   List<int> calculated_score;
+  bool summary_game;
 
   Game.empty(int l)
   {
@@ -168,6 +169,7 @@ class Game
     this.points = List(l);
     this.dubli = false;
     this.calculated_score = List<int>(l);
+    this.summary_game = false;
 
     for(int i=0;i<l;i++)
     {
@@ -176,6 +178,16 @@ class Game
       this.players[i] = 0;
       this.calculated_score[i] = 0;
     }
+  }
+
+  Game.summary()
+  {
+    this.players = List();
+    this.seen = List();
+    this.points = List();
+    this.dubli = false;
+    this.calculated_score = List();
+    this.summary_game = true;
   }
 
   Game(List<int> players, List<bool> seen, List<int> points, int winner, bool dubli)
@@ -205,7 +217,6 @@ class Game
         this.points[i] = 0; // if not seen, then score is 0 by default
       }
     }
-
 
     // calculate score for each person and update chart
     for(int i = 0;i<this.players.length;i++)
@@ -313,6 +324,47 @@ class ScoreCard
   int get_amount_to_pay(int player_from, int player_to)
   {
     return this.score_grid[player_to][player_from];
+  }
+
+  void minimize_transactions()
+  {
+    int c = 1;
+    while( c > 0)
+      {
+        c = 0;
+        for(int i = 0;i<MAX_PLAYERS; i++)
+          {
+            for(int j = i+1; j<MAX_PLAYERS;j++)
+              {
+                if(this.score_grid[i][j] != 0)
+                  {
+                    for(int u = 0;u<MAX_PLAYERS;u++)
+                      {
+                        if(this.score_grid[j][u] != 0)
+                          {
+                            if( this.score_grid[j][u] > this.score_grid[i][j])
+                              {
+                                this.score_grid[i][u] += this.score_grid[i][j];
+                                this.score_grid[j][u] -= this.score_grid[i][j];
+                                this.score_grid[i][j] = 0;
+                                c+=1;
+                                break;
+                              }
+                            else
+                              {
+                                this.score_grid[i][u] += this.score_grid[j][u];
+                                this.score_grid[i][j] -= this.score_grid[j][u];
+                                this.score_grid[j][u] = 0;
+                                c+=1;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+        for(int x = 0;x<MAX_PLAYERS;x++)
+          this.score_grid[x][x] = 0;
+      }
   }
 }
 
@@ -446,6 +498,18 @@ class GameState with ChangeNotifier
   int get_amount_to_pay(int player_from, int player_to)
   {
     return this.score_card.get_amount_to_pay(player_from,player_to);
+  }
+
+  void minimize_transactions()
+  {
+    this.score_card.minimize_transactions();
+    this.score_card.games = []; // deleting all games
+
+    //Add one summary game
+    Game g = Game.summary();
+    this.add_new_game(g);
+
+    notifyListeners();
   }
 }
 
