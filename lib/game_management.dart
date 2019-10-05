@@ -23,7 +23,7 @@ class GameManagementTabState extends State<GameManagementTab> {
             children: <Widget>[
               FlatButton.icon(
                   label:Text("Clear All"),
-                  icon: Icon(Icons.fiber_new),
+                  icon: Icon(Icons.clear_all),
                   onPressed: ()  => deleteAll(context,game_state)),
               FlatButton.icon(
                   label:Text("Add Game"),
