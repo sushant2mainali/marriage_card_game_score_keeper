@@ -18,6 +18,7 @@ class TabbedApp extends StatelessWidget{
     return ChangeNotifierProvider(
       builder: (context)=>GameState(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: DefaultTabController(
             length: 3,
             child: Scaffold(
