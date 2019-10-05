@@ -72,7 +72,7 @@ class HomeTab extends StatelessWidget {
             FlatButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(0);
+                Navigator.of(context).pop(0.0);
               },
             ),
           ],

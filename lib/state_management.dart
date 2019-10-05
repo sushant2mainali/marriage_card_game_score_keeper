@@ -507,9 +507,26 @@ class GameState with ChangeNotifier
     this.score_card.minimize_transactions();
     this.score_card.games = []; // deleting all games
 
-    //Add one summary game
-    Game g = Game.summary();
-    this.add_new_game(g);
+    bool clear_all = true;
+
+    // if all values are 0, then it is same as new game
+    for(int i = 0;i<MAX_PLAYERS;i++)
+      {
+        for(int j=0;j<MAX_PLAYERS;j++)
+          if(this.score_card.score_grid[i][j] != 0)
+            {
+              clear_all = false;
+              break;
+            }
+      }
+
+    if(!clear_all)
+      {
+        //Add one summary game
+        Game g = Game.summary();
+        this.add_new_game(g);
+      }
+
 
     notifyListeners();
   }
