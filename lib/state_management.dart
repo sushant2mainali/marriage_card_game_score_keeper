@@ -1,7 +1,18 @@
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert';
 
+part 'state_management.g.dart';
+
+
+// If any changes are made to thsi class, please run the following line
+// flutter pub run build_runner build
 final int MAX_PLAYERS = 20;
 
+@JsonSerializable()
 class Player
 {
   String name;
@@ -16,8 +27,20 @@ class Player
     this.is_playing = false;
     this.position = -1;
   }
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
+
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$UserToJson`.
+  Map<String, dynamic> toJson() => _$PlayerToJson(this);
+
+
 }
 
+@JsonSerializable()
 class Players
 {
   var players = new List<Player>(MAX_PLAYERS);
@@ -31,6 +54,17 @@ class Players
       }
     number_of_players = 0;
   }
+
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory Players.fromJson(Map<String, dynamic> json) => _$PlayersFromJson(json);
+
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$UserToJson`.
+  Map<String, dynamic> toJson() => _$PlayersToJson(this);
+
 
   int get total_playing
   {
@@ -151,7 +185,7 @@ class Players
 
 }
 
-
+@JsonSerializable()
 class Game
 {
   List<int> players;
@@ -161,6 +195,16 @@ class Game
   bool dubli;
   List<int> calculated_score;
   bool summary_game;
+
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory Game.fromJson(Map<String, dynamic> json) => _$GameFromJson(json);
+
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$UserToJson`.
+  Map<String, dynamic> toJson() => _$GameToJson(this);
 
   Game.empty(int l)
   {
@@ -241,10 +285,21 @@ class Game
 
 enum ScoreCardAction{ADD,REMOVE}
 
+@JsonSerializable()
 class ScoreCard
 {
   List<Game> games;
   List<List<int>> score_grid = new List(MAX_PLAYERS);
+
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory ScoreCard.fromJson(Map<String, dynamic> json) => _$ScoreCardFromJson(json);
+
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$UserToJson`.
+  Map<String, dynamic> toJson() => _$ScoreCardToJson(this);
 
   ScoreCard()
   {
@@ -368,27 +423,94 @@ class ScoreCard
   }
 }
 
-
+@JsonSerializable()
 class GameState with ChangeNotifier
 {
   Players all_players;
   ScoreCard score_card;
   double amount_per_point;
 
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory GameState.fromJson(Map<String, dynamic> json) => _$GameStateFromJson(json);
+
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$UserToJson`.
+  Map<String, dynamic> toJson() => _$GameStateToJson(this);
+
   GameState()
   {
     all_players = new Players();
     score_card = new ScoreCard();
     amount_per_point = 1;
+
+    this.load_from_file();
   }
 
-  int add_player(String name)
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/saved_game_state.bin');
+  }
+
+  void load_from_file() async{
+    GameState g;
+    final file = await _localFile;
+    bool file_exists = await file.exists();
+    var file_contents;
+
+    if(file_exists)
+      {
+        try
+        {
+          file_contents = await file.readAsString();
+          Map gameState_map = jsonDecode(file_contents);
+          g = GameState.fromJson(gameState_map);
+        }
+        catch (Exception)
+        {
+          // in case of decoding error
+          file_contents = jsonEncode(this);
+          await file.writeAsString(file_contents);
+          g = this;
+        }
+      }
+    else
+      {
+        file_contents = jsonEncode(this);
+        await file.writeAsString(file_contents);
+        g = this;
+      }
+
+    // copy everything to this class
+    this.all_players = g.all_players;
+    this.score_card = g.score_card;
+    this.amount_per_point = g.amount_per_point;
+
+    notifyListeners();
+  }
+
+  Future<File> update_file() async{
+    final file = await _localFile;
+    String file_contents = jsonEncode(this);
+    await file.writeAsString(file_contents);
+    return file;
+  }
+
+  Future<int> add_player(String name) async
   {
     int id =  all_players.add_player(name);
-    if( id != -1)
+    if( id != -1) {
+      await this.update_file();
       notifyListeners();
+    }
     return id;
-
   }
 
   int get number_of_players{
@@ -400,17 +522,20 @@ class GameState with ChangeNotifier
     return this.all_players.index_of_player_at(position);
   }
 
-  void set_not_playing(int i)
+  void set_not_playing(int i) async
   {
     this.all_players.stop_playing_player(i);
+    await this.update_file();
     notifyListeners();
   }
 
-  bool set_playing(int i)
+  Future<bool> set_playing(int i) async
   {
     bool to_ret =  this.all_players.start_playing_player(i);
-    if(to_ret)
+    if(to_ret) {
+      await this.update_file();
       notifyListeners();
+    }
     return to_ret;
   }
 
@@ -424,7 +549,7 @@ class GameState with ChangeNotifier
     return this.all_players.player_name(index);
   }
 
-  bool delete_player(int index)
+  Future<bool> delete_player(int index) async
   {
     bool to_ret = false;
     if(!this.score_card.is_payment_remaining(index))
@@ -434,13 +559,17 @@ class GameState with ChangeNotifier
       }
 
     if(to_ret)
-      notifyListeners();
+      {
+        await this.update_file();
+        notifyListeners();
+      }
     return to_ret;
   }
 
-  void update_player_name(int index, String name)
+  void update_player_name(int index, String name) async
   {
     this.all_players.update_player_name(index, name);
+    await this.update_file();
     notifyListeners();
   }
 
@@ -459,9 +588,10 @@ class GameState with ChangeNotifier
     return l;
   }
 
-  void add_new_game(Game g)
+  void add_new_game(Game g) async
   {
     this.score_card.add_game(g);
+    await this.update_file();
     notifyListeners();
   }
 
@@ -475,15 +605,17 @@ class GameState with ChangeNotifier
     return score_card.game_at_index(index);
   }
 
-  Game delete_single_game(int index)
+  void delete_single_game(int index) async
   {
     this.score_card.delete_single_game(index);
+    await this.update_file();
     notifyListeners();
   }
 
-  void delete_all_games()
+  void delete_all_games() async
   {
     this.score_card = new ScoreCard();
+    await this.update_file();
     notifyListeners();
   }
 
@@ -502,7 +634,7 @@ class GameState with ChangeNotifier
     return this.score_card.get_amount_to_pay(player_from,player_to);
   }
 
-  void minimize_transactions()
+  void minimize_transactions() async
   {
     this.score_card.minimize_transactions();
     this.score_card.games = []; // deleting all games
@@ -527,13 +659,14 @@ class GameState with ChangeNotifier
         this.add_new_game(g);
       }
 
-
+    await this.update_file();
     notifyListeners();
   }
 
-  void set_amount_per_point(double amount)
+  void set_amount_per_point(double amount) async
   {
     this.amount_per_point = amount;
+    await this.update_file();
     notifyListeners();
   }
 }

@@ -167,7 +167,7 @@ class GameManagementTabState extends State<GameManagementTab> {
       if(deleteAllConfirm == "Ok")
       {
         game_state.delete_all_games();
-        showAlertDialog(context,"Message","Sabai game haru suhaaaa!");
+        showAlertDialog(context,"Message","Sabai game haru swahaaa!");
       }
     }
     else

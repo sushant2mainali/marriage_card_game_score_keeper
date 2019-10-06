@@ -49,18 +49,11 @@ class PlayerManagementTab extends StatelessWidget {
               IconButton(icon: Icon(Icons.check_box), onPressed: () {
                 game_state.set_not_playing(index);
               }) :
-              IconButton(icon: Icon(Icons.check_box_outline_blank), onPressed: () {
-                if (!game_state.set_playing(index)) showAlertDialog(
-                    context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
-              }),
+              IconButton(icon: Icon(Icons.check_box_outline_blank), onPressed: () { set_playing(context, game_state, index); }),
               title: Row(children:[CircleAvatar(backgroundImage: AssetImage(image_name)),Text("  "), GestureDetector( onTap: () { update_player_name(context, game_state, index);},child: new Text(game_state.get_player_name(index)),)]), //
 
               //TextFormField(decoration:InputDecoration(border: InputBorder.none) , initialValue: item.name, onFieldSubmitted: (String newName){ game_state.update_player_name(position,newName);}),
-              trailing: IconButton(icon: Icon(Icons.delete), onPressed: () {
-                String player_name = game_state.get_player_name(index);
-                if (!game_state.delete_player(index)) showAlertDialog(
-                    context, "Delete garna milena: $player_name ko hisab kitab baaki cha. Paisa na tiri bhagna mildaina!");
-              }),
+              trailing: IconButton(icon: Icon(Icons.delete), onPressed: () { delete_player(context, game_state, index);}),
             );
           },
         );
@@ -85,7 +78,19 @@ class PlayerManagementTab extends StatelessWidget {
         ),
       );
     }
+  }
 
+  void delete_player(BuildContext context, GameState game_state, int index) async
+  {
+    String player_name = game_state.get_player_name(index);
+    bool status = await game_state.delete_player(index);
+    if (!status ) showAlertDialog(context, "Delete garna milena: $player_name ko hisab kitab baaki cha. Paisa na tiri bhagna mildaina!");
+  }
+
+  void set_playing(BuildContext context, GameState game_state, int index) async
+  {
+    bool status = await game_state.set_playing(index);
+    if (!status) showAlertDialog(context, "Marriage ma ek palta ma 5 jaana matra khelna milcha! Khelna aaudaina bhane gaera bhura bhuri sita jutpatti khela hai!");
   }
 
   showAlertDialog(BuildContext context, String text) {

@@ -5,6 +5,7 @@ import 'package:marriage_game_scorekeeper/game_management.dart';
 import 'package:marriage_game_scorekeeper/home_page.dart';
 import 'package:provider/provider.dart';
 
+
 void main() {
   runApp(TabbedApp());
 }
@@ -12,11 +13,10 @@ void main() {
 TabController controller;
 
 class TabbedApp extends StatelessWidget{
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      builder: (context)=>GameState(),
+      builder: (context)=> GameState(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: DefaultTabController(
