@@ -284,7 +284,7 @@ class AddGameScreenState extends State<NewGamePage> {
     final game_state = Provider.of<GameState>(context);
     widget.game_data.players = game_state.playing_players_list;
 
-    List<Row> rows = List(widget.game_data.players.length+1);
+    List<Row> rows = List(widget.game_data.players.length+2);
 
     int row_index = 1; // row index 0 is reserved for the heading
     for(int i = 0; i<widget.game_data.players.length;i++)
@@ -311,6 +311,13 @@ class AddGameScreenState extends State<NewGamePage> {
       new Container(width: 60, child:Text("Seen",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
       new Container(width: 60, child:Text("Score",style: TextStyle(fontWeight: FontWeight.bold),textAlign: TextAlign.center)),
     ]);
+
+    rows[row_index] = Row( children: <Widget>[
+      new Container(width: 170, child:Text("Game Ended with Dubli? ",style: TextStyle(fontWeight: FontWeight.bold,))),
+      new Container(width: 60, child:Checkbox(value: widget.game_data.dubli,  onChanged: (bool newValue) {setState(() {widget.game_data.dubli = newValue;});} )),
+
+    ]);
+
     return rows;
   }
 
