@@ -21,7 +21,8 @@ class PlayerManagementTab extends StatelessWidget {
     if(name.length > 0)
       {
         name = name[0].toUpperCase() + name.substring(1); // converting first letter to uppercase
-        if (game_state.add_player(name) == -1)
+        int status = await game_state.add_player(name);
+        if ( status == -1)
           showAlertDialog(context, "20 jaana bhanda halna mildaina. Dherai naam halera garna khojya k? Khelne bela 5 jaana ta ho max.");
       }
   }
